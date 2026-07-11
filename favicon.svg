@@ -1,0 +1,27 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5A17A0"/>
+      <stop offset="1" stop-color="#886AE9"/>
+    </linearGradient>
+    <linearGradient id="branco" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FEFCFF"/>
+      <stop offset="1" stop-color="#F0E9FB"/>
+    </linearGradient>
+    <linearGradient id="laranja" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FE8A5B"/>
+      <stop offset="1" stop-color="#FE6636"/>
+    </linearGradient>
+    <clipPath id="cap"><rect x="-160" y="-72" width="320" height="144" rx="72"/></clipPath>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g transform="translate(256 256) rotate(-40)">
+    <g clip-path="url(#cap)">
+      <rect x="-160" y="-72" width="160" height="144" fill="url(#branco)"/>
+      <rect x="0" y="-72" width="160" height="144" fill="url(#laranja)"/>
+    </g>
+    <rect x="-4" y="-72" width="8" height="144" fill="#3A0A6E" opacity="0.22"/>
+    <rect x="-160" y="-72" width="320" height="144" rx="72" fill="none" stroke="#2E0857" stroke-opacity="0.18" stroke-width="4"/>
+    <rect x="-138" y="-54" width="276" height="30" rx="15" fill="#ffffff" opacity="0.22"/>
+  </g>
+</svg>
