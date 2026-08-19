@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <clipPath id="metade">
+    <rect x="32" y="19.85" width="26.25" height="24.3"/>
+  </clipPath>
+  <rect width="64" height="64" rx="8.3" fill="#9B9BA1"/>
+  <g transform="rotate(-45 32 32)">
+    <rect x="5.75" y="19.85" width="52.5" height="24.3" rx="12.15" fill="#F2BC3C"/>
+    <rect x="5.75" y="19.85" width="52.5" height="24.3" rx="12.15" fill="#E2372C" clip-path="url(#metade)"/>
+    <rect x="31.49" y="19.85" width="1.02" height="24.3" fill="#9B9BA1"/>
+  </g>
+</svg>
