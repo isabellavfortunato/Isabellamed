@@ -806,19 +806,31 @@ async function ligarAvisos(){
     statusAvisos("No iPhone, salve este aplicativo na tela inicial pelo botão de compartilhar do Safari e abra por lá. Só assim o aviso chega com a tela bloqueada.");
     return;
   }
-  const suportado = await isSupported().catch(()=>false);
-  if(!suportado || !("serviceWorker" in navigator)){ statusAvisos("Este navegador não recebe avisos."); return; }
+  if(typeof Notification === "undefined" || !("serviceWorker" in navigator)){
+    statusAvisos("Este navegador não recebe avisos.");
+    return;
+  }
   try{
-    const permissao = await Notification.requestPermission();
+    // A permissão precisa ser pedida logo no toque, sem nenhuma espera antes,
+    // senão o Safari deixa de considerar que houve um gesto seu.
+    const permissao = Notification.permission === "granted"
+      ? "granted"
+      : await Notification.requestPermission();
     if(permissao !== "granted"){ statusAvisos("Sem a permissão o aviso não aparece na tela bloqueada."); return; }
+
+    const suportado = await isSupported().catch(()=>false);
+    if(!suportado){ statusAvisos("Este navegador não recebe avisos."); return; }
+
     const registro = await navigator.serviceWorker.register("firebase-messaging-sw.js");
+    await navigator.serviceWorker.ready;
     if(!messaging) messaging = getMessaging(appFB);
     const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registro });
     if(!token){ statusAvisos("Não foi possível registrar este aparelho."); return; }
     await setDoc(docRef, { tokens: arrayUnion(token) }, { merge: true });
     statusAvisos("Avisos ligados neste aparelho.");
   } catch(erro){
-    statusAvisos("Não deu para ligar os avisos agora. " + (erro && erro.message ? erro.message : ""));
+    const codigo = erro && (erro.code || erro.name) ? " [" + (erro.code || erro.name) + "]" : "";
+    statusAvisos("Não deu para ligar os avisos agora." + codigo + " " + (erro && erro.message ? erro.message : ""));
   }
 }
 
