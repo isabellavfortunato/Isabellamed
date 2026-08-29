@@ -3,8 +3,8 @@
    aparelho. A notificação em segundo plano é exibida automaticamente a partir
    do conteúdo enviado, por isso não a exibimos de novo aqui. */
 
-importScripts("https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
 
 firebase.initializeApp({
   apiKey: "AIzaSyA7bDVe9YOp4W1FXb3lf6hnCV7vOgvXP8E",
