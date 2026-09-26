@@ -129,6 +129,16 @@
   .est-info{margin-top:4px;font-size:12.5px;color:var(--cinza);}
   .est-acoes{margin-top:11px;display:flex;gap:8px;}
   .est-acoes button{border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;color:var(--grafite);background:rgba(28,28,30,0.07);padding:6px 12px;border-radius:999px;}
+
+  .sos{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--linha);border-radius:14px;padding:12px 15px;box-shadow:0 6px 18px rgba(28,28,30,0.05);}
+  .sos-info{display:flex;flex-direction:column;gap:2px;}
+  .sos-titulo{font-size:14px;font-weight:600;color:var(--tinta);}
+  .sos-sub{font-size:12.5px;color:var(--cinza);}
+  .sos-ctrl{display:flex;align-items:center;gap:8px;}
+  .sos-ctrl button{border:none;cursor:pointer;font-family:inherit;font-weight:600;}
+  #sosMais{font-size:13px;color:#fff;background:linear-gradient(135deg,var(--tinta),var(--grafite));padding:9px 14px;border-radius:999px;}
+  #sosMenos{width:34px;height:34px;border-radius:10px;background:rgba(28,28,30,0.07);color:var(--tinta);font-size:20px;line-height:1;}
+  #sosMenos:disabled{opacity:.4;cursor:default;}
   .alerta{margin-top:14px;background:#fff;border:1px solid var(--linha);border-left:4px solid var(--cinza);border-radius:12px;padding:11px 14px;font-size:13px;color:var(--grafite);line-height:1.45;}
   .alerta.urgente{border-left-color:#C0392B;color:#8A2A22;font-weight:600;background:#FDF3F2;}
   .confirma-box{margin-top:18px;background:#fff;border:1px solid var(--borda-med);border-radius:14px;padding:14px 15px;box-shadow:0 8px 22px rgba(28,28,30,0.08);}
@@ -192,7 +202,7 @@
     <section id="viewHoje">
       <div id="confirma"></div>
       <div class="barra">
-        <span class="texto" id="contador">0 de 7 itens concluídos</span>
+        <span class="texto" id="contador">0 de 6 itens concluídos</span>
         <button id="limparDia" type="button">limpar dia</button>
       </div>
       <div class="editando" id="editando"></div>
@@ -206,16 +216,6 @@
             <span class="hora">10:00</span>
             <span class="conteudo">
               <span class="item">Atentah 60 mg</span>
-            </span>
-          </label>
-        </li>
-        <li class="entry med" data-id="alprazolam-tarde">
-          <span class="node"></span>
-          <label class="card">
-            <input type="checkbox" class="chk"><span class="box"></span>
-            <span class="hora">16:30</span>
-            <span class="conteudo">
-              <span class="item">Alprazolam 0,5 mg</span>
             </span>
           </label>
         </li>
@@ -273,6 +273,17 @@
           </label>
         </li>
       </ol>
+
+      <div class="sos" id="sosBox">
+        <div class="sos-info">
+          <span class="sos-titulo">Alprazolam SOS</span>
+          <span class="sos-sub" id="sosSub">0 doses</span>
+        </div>
+        <div class="sos-ctrl">
+          <button id="sosMenos" type="button" aria-label="desfazer">−</button>
+          <button id="sosMais" type="button">Tomei 0,5 mg</button>
+        </div>
+      </div>
     </section>
 
     <!-- VISÃO DO MÊS -->
@@ -330,7 +341,7 @@ const firebaseConfig = {
 const VAPID_KEY = "BPALGN50gm_HYWPdE8Ll6r6Ef4Amn--fKcg8IW8CglaczYj0h93XvKuoxJ-bix3tdo4kL5bzlSU-28PTrpJHURM";
 // ============================================================
 
-const TICK = ["atentah","alprazolam-tarde","lubip","litio-20","lamitor","quetiapina","alprazolam-noite"];
+const TICK = ["atentah","lubip","litio-20","lamitor","quetiapina","alprazolam-noite"];
 const TOTAL = TICK.length;
 const MEDS = {
   atentah:     { nome:"Atentah 60 mg",             curto:"Atentah",            mgPorCp:60,   diaria:60,  baseMg:39*60 },
@@ -338,12 +349,11 @@ const MEDS = {
   lamotrigina: { nome:"Lamotrigina 100 mg",        curto:"lamotrigina",        mgPorCp:100,  diaria:200, baseMg:39*100 },
   litio:       { nome:"Carbonato de lítio 300 mg", curto:"carbonato de lítio", mgPorCp:300,  diaria:900, baseMg:174*300 },
   quetiapina:  { nome:"Quetiapina",                curto:"quetiapina",         mgPorCp:null, diaria:25,  baseMg:59*50+32*25, detalhe:"começou com 59 comprimidos de 50 mg e 32 de 25 mg" },
-  alprazolam:  { nome:"Alprazolam",                curto:"alprazolam",         mgPorCp:null, diaria:1, baseMg:52*1+8*2,   detalhe:"começou com 52 comprimidos de 1 mg e 8 de 2 mg" }
+  alprazolam:  { nome:"Alprazolam",                curto:"alprazolam",         mgPorCp:null, diaria:0.5, baseMg:52*1+8*2,   detalhe:"começou com 52 comprimidos de 1 mg e 8 de 2 mg" }
 };
 
 const DOSES = {
   "atentah":          { med:"atentah",     mg:60 },
-  "alprazolam-tarde": { med:"alprazolam",  mg:0.5 },
   "lubip":            { med:"lubip",       mg:40 },
   "litio-20":         { med:"litio",       mg:900 },
   "lamitor":          { med:"lamotrigina", mg:200 },
@@ -406,6 +416,7 @@ function renderDia(){
   });
   atualizarContador();
   renderAlerta();
+  renderSos();
   if(s===hojeIso){
     editando.innerHTML = "<span>Você está marcando o dia de <b>hoje</b></span>";
   } else {
@@ -440,6 +451,7 @@ function consumido(id){
     Object.keys(DOSES).forEach(k=>{
       if(o[k] && DOSES[k].med === id) mg += DOSES[k].mg;
     });
+    if(id === "alprazolam" && o.sos) mg += o.sos * 0.5;
   });
   return mg;
 }
@@ -592,6 +604,33 @@ document.getElementById("limparDia").addEventListener("click",()=>{
   estado.dias[iso(selecionado)] = {};
   salvar(); renderDia(); renderEstoque();
 });
+
+// ----- alprazolam SOS -----
+const sosSub = document.getElementById("sosSub");
+const sosMais = document.getElementById("sosMais");
+const sosMenos = document.getElementById("sosMenos");
+
+function contaSos(){
+  const o = readDay(iso(selecionado));
+  return (o && typeof o.sos === "number") ? o.sos : 0;
+}
+function renderSos(){
+  const n = contaSos();
+  sosSub.textContent = n === 0 ? "Nenhuma dose registrada" :
+    (n === 1 ? "1 dose registrada, 0,5 mg" : n + " doses registradas, " + fmtNum(n * 0.5) + " mg");
+  sosMenos.disabled = (n === 0);
+}
+function ajustarSos(delta){
+  const s = iso(selecionado);
+  if(!estado.dias[s]) estado.dias[s] = {};
+  const atual = (typeof estado.dias[s].sos === "number") ? estado.dias[s].sos : 0;
+  let novo = atual + delta;
+  if(novo < 0) novo = 0;
+  estado.dias[s].sos = novo;
+  salvar(); renderSos(); renderEstoque();
+}
+sosMais.addEventListener("click",()=>ajustarSos(1));
+sosMenos.addEventListener("click",()=>ajustarSos(-1));
 
 const calTitulo = document.getElementById("calTitulo");
 const calGrid = document.getElementById("calGrid");
