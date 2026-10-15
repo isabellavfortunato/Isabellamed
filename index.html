@@ -202,7 +202,7 @@
     <section id="viewHoje">
       <div id="confirma"></div>
       <div class="barra">
-        <span class="texto" id="contador">0 de 6 itens concluídos</span>
+        <span class="texto" id="contador">0 de 7 itens concluídos</span>
         <button id="limparDia" type="button">limpar dia</button>
       </div>
       <div class="editando" id="editando"></div>
@@ -269,6 +269,17 @@
             <span class="hora">20:00</span>
             <span class="conteudo">
               <span class="item">Alprazolam 0,5 mg</span>
+            </span>
+          </label>
+        </li>
+        <li class="entry med" data-id="ansiodoron">
+          <span class="node"></span>
+          <label class="card">
+            <input type="checkbox" class="chk"><span class="box"></span>
+            <span class="hora">20:00</span>
+            <span class="conteudo">
+              <span class="item">Ansiodoron</span>
+              <span class="nota">2 comprimidos</span>
             </span>
           </label>
         </li>
@@ -341,7 +352,7 @@ const firebaseConfig = {
 const VAPID_KEY = "BPALGN50gm_HYWPdE8Ll6r6Ef4Amn--fKcg8IW8CglaczYj0h93XvKuoxJ-bix3tdo4kL5bzlSU-28PTrpJHURM";
 // ============================================================
 
-const TICK = ["atentah","lubip","litio-20","lamitor","quetiapina","alprazolam-noite"];
+const TICK = ["atentah","lubip","litio-20","lamitor","quetiapina","alprazolam-noite","ansiodoron"];
 const TOTAL = TICK.length;
 const MEDS = {
   atentah:     { nome:"Atentah 60 mg",             curto:"Atentah",            mgPorCp:60,   diaria:60,  baseMg:39*60 },
@@ -349,7 +360,8 @@ const MEDS = {
   lamotrigina: { nome:"Lamotrigina 100 mg",        curto:"lamotrigina",        mgPorCp:100,  diaria:200, baseMg:39*100 },
   litio:       { nome:"Carbonato de lítio 300 mg", curto:"carbonato de lítio", mgPorCp:300,  diaria:900, baseMg:174*300 },
   quetiapina:  { nome:"Quetiapina",                curto:"quetiapina",         mgPorCp:null, diaria:25,  baseMg:59*50+32*25, detalhe:"começou com 59 comprimidos de 50 mg e 32 de 25 mg" },
-  alprazolam:  { nome:"Alprazolam",                curto:"alprazolam",         mgPorCp:null, diaria:0.5, baseMg:52*1+8*2,   detalhe:"começou com 52 comprimidos de 1 mg e 8 de 2 mg" }
+  alprazolam:  { nome:"Alprazolam",                curto:"alprazolam",         mgPorCp:null, diaria:0.5, baseMg:52*1+8*2,   detalhe:"começou com 52 comprimidos de 1 mg e 8 de 2 mg" },
+  ansiodoron:  { nome:"Ansiodoron",                curto:"Ansiodoron",         mgPorCp:null, diaria:2,   baseMg:44, cp:true }
 };
 
 const DOSES = {
@@ -358,7 +370,8 @@ const DOSES = {
   "litio-20":         { med:"litio",       mg:900 },
   "lamitor":          { med:"lamotrigina", mg:200 },
   "quetiapina":       { med:"quetiapina",  mg:25 },
-  "alprazolam-noite": { med:"alprazolam",  mg:0.5 }
+  "alprazolam-noite": { med:"alprazolam",  mg:0.5 },
+  "ansiodoron":       { med:"ansiodoron",  mg:2 }
 };
 
 const DATA_BASE = "2026-08-21";
@@ -527,9 +540,11 @@ function renderEstoque(){
 
     const info = document.createElement("div");
     info.className = "est-info";
-    let texto = m.mgPorCp
-      ? fmtNum(r / m.mgPorCp) + " comprimidos de " + fmtNum(m.mgPorCp) + " mg"
-      : fmtNum(r) + " mg no total";
+    let texto = m.cp
+      ? fmtNum(r) + " comprimidos"
+      : m.mgPorCp
+        ? fmtNum(r / m.mgPorCp) + " comprimidos de " + fmtNum(m.mgPorCp) + " mg"
+        : fmtNum(r) + " mg no total";
     if(p.data) texto += ", acaba por volta de " + dataPorExtenso(p.data);
     if(m.detalhe) texto += ". " + m.detalhe;
     info.textContent = texto;
