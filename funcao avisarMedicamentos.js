@@ -75,6 +75,7 @@ function diasRestantes(dados, med) {
       if (o[k] && DOSES_MG[k].med === med) consumido += DOSES_MG[k].mg;
     });
     if (med === "alprazolam" && o.sos) consumido += o.sos * 0.5;
+    if (med === "ansiodoron" && o.sosAnsio) consumido += o.sosAnsio;
   });
   const restante = Math.max(0, baseMg - consumido);
   return { restante: restante, dias: restante / cfg.diaria };

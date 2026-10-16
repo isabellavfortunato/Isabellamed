@@ -138,9 +138,9 @@
   .sos-sub{font-size:12.5px;color:var(--cinza);}
   .sos-ctrl{display:flex;align-items:center;gap:8px;}
   .sos-ctrl button{border:none;cursor:pointer;font-family:inherit;font-weight:600;}
-  #sosMais{font-size:13px;color:#fff;background:linear-gradient(135deg,var(--tinta),var(--grafite));padding:9px 14px;border-radius:999px;}
-  #sosMenos{width:34px;height:34px;border-radius:10px;background:rgba(28,28,30,0.07);color:var(--tinta);font-size:20px;line-height:1;}
-  #sosMenos:disabled{opacity:.4;cursor:default;}
+  #sosMais,#sosAnsio1,#sosAnsio2{font-size:13px;color:#fff;background:linear-gradient(135deg,var(--tinta),var(--grafite));padding:9px 14px;border-radius:999px;}
+  #sosMenos,#sosAnsioMenos{width:34px;height:34px;border-radius:10px;background:rgba(28,28,30,0.07);color:var(--tinta);font-size:20px;line-height:1;}
+  #sosMenos:disabled,#sosAnsioMenos:disabled{opacity:.4;cursor:default;}
   .alerta{margin-top:14px;background:#fff;border:1px solid var(--linha);border-left:4px solid var(--cinza);border-radius:12px;padding:11px 14px;font-size:13px;color:var(--grafite);line-height:1.45;}
   .alerta.urgente{border-left-color:#C0392B;color:#8A2A22;font-weight:600;background:#FDF3F2;}
   .confirma-box{margin-top:18px;background:#fff;border:1px solid var(--borda-med);border-radius:14px;padding:14px 15px;box-shadow:0 8px 22px rgba(28,28,30,0.08);}
@@ -297,6 +297,18 @@
           <button id="sosMais" type="button">Tomei 0,5 mg</button>
         </div>
       </div>
+
+      <div class="sos" id="sosAnsioBox">
+        <div class="sos-info">
+          <span class="sos-titulo">Ansiodoron SOS</span>
+          <span class="sos-sub" id="sosAnsioSub">Nenhuma dose registrada</span>
+        </div>
+        <div class="sos-ctrl">
+          <button id="sosAnsioMenos" type="button" aria-label="desfazer">−</button>
+          <button id="sosAnsio1" type="button">Tomei 1</button>
+          <button id="sosAnsio2" type="button">Tomei 2</button>
+        </div>
+      </div>
     </section>
 
     <!-- VISÃO DO MÊS -->
@@ -432,6 +444,7 @@ function renderDia(){
   atualizarContador();
   renderAlerta();
   renderSos();
+  renderSosAnsio();
   if(s===hojeIso){
     editando.innerHTML = "<span>Você está marcando o dia de <b>hoje</b></span>";
   } else {
@@ -467,6 +480,7 @@ function consumido(id){
       if(o[k] && DOSES[k].med === id) mg += DOSES[k].mg;
     });
     if(id === "alprazolam" && o.sos) mg += o.sos * 0.5;
+    if(id === "ansiodoron" && o.sosAnsio) mg += o.sosAnsio;
   });
   return mg;
 }
@@ -654,6 +668,35 @@ function ajustarSos(delta){
 }
 sosMais.addEventListener("click",()=>ajustarSos(1));
 sosMenos.addEventListener("click",()=>ajustarSos(-1));
+
+// ----- ansiodoron SOS -----
+const sosAnsioSub = document.getElementById("sosAnsioSub");
+const sosAnsio1 = document.getElementById("sosAnsio1");
+const sosAnsio2 = document.getElementById("sosAnsio2");
+const sosAnsioMenos = document.getElementById("sosAnsioMenos");
+
+function contaSosAnsio(){
+  const o = readDay(iso(selecionado));
+  return (o && typeof o.sosAnsio === "number") ? o.sosAnsio : 0;
+}
+function renderSosAnsio(){
+  const n = contaSosAnsio();
+  sosAnsioSub.textContent = n === 0 ? "Nenhuma dose registrada" :
+    (n === 1 ? "1 comprimido registrado" : n + " comprimidos registrados");
+  sosAnsioMenos.disabled = (n === 0);
+}
+function ajustarSosAnsio(delta){
+  const s = iso(selecionado);
+  if(!estado.dias[s]) estado.dias[s] = {};
+  const atual = (typeof estado.dias[s].sosAnsio === "number") ? estado.dias[s].sosAnsio : 0;
+  let novo = atual + delta;
+  if(novo < 0) novo = 0;
+  estado.dias[s].sosAnsio = novo;
+  salvar(); renderSosAnsio(); renderEstoque();
+}
+sosAnsio1.addEventListener("click",()=>ajustarSosAnsio(1));
+sosAnsio2.addEventListener("click",()=>ajustarSosAnsio(2));
+sosAnsioMenos.addEventListener("click",()=>ajustarSosAnsio(-1));
 
 const calTitulo = document.getElementById("calTitulo");
 const calGrid = document.getElementById("calGrid");
